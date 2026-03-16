@@ -3,8 +3,11 @@ const { generateMap, getTileColor, isWalkable } = require('../../utils/mapgen');
 const { getSeasonByDay, getSeasonColors, SEASONS } = require('../../utils/season');
 const { randomWeather, WEATHER_TYPES } = require('../../utils/weather');
 const { generateResponse, recordDialogue } = require('../../utils/dialogue');
+const { getDefaultMusicForSeason, getAllMusicList, AudioPlayer } = require('../../utils/audio');
 
 const TILE_SIZE = 16; // 每个格子像素大小
+
+const audioPlayer = new AudioPlayer();
 
 Page({
   data: {
@@ -19,6 +22,11 @@ Page({
     entity: null,
     inputText: '',
     canInput: true,
+    // 音乐
+    showMusicSettings: false,
+    currentMusic: null,
+    allMusicList: [],
+    volume: 0.3,
     // 摇杆
     joystick: {
       x: 80,
@@ -35,6 +43,21 @@ Page({
     this.initGame();
   },
 
+  onUnload() {
+    if (this.animationId) {
+      clearTimeout(this.animationId);
+    }
+    audioPlayer.stop();
+  },
+
+  onHide() {
+    audioPlayer.pause();
+  },
+
+  onShow() {
+    audioPlayer.resume();
+  },
+
   initGame() {
     // 初始化玩家
     const player = initPlayer();
@@ -42,6 +65,7 @@ Page({
     const weatherKey = randomWeather(seasonKey, player.mood);
     const season = getSeasonColors(seasonKey);
     const weather = WEATHER_TYPES[weatherKey];
+    const defaultMusic = getDefaultMusicForSeason(seasonKey, weatherKey);
 
     // 生成地图
     const map = generateMap(30, 20, seasonKey, weatherKey);
@@ -64,11 +88,16 @@ Page({
       season: SEASONS[seasonKey],
       seasonBgColor: bgColors[seasonKey],
       weather,
-      moodDesc: getMoodDescription(player.mood)
+      moodDesc: getMoodDescription(player.mood),
+      currentMusic: defaultMusic,
+      allMusicList: getAllMusicList()
     });
 
     this.updateMoodColor();
     this.startAnimation();
+    // 播放默认音乐
+    audioPlayer.play(defaultMusic, true);
+    audioPlayer.setVolume(this.data.volume);
   },
 
   // 渲染地图
@@ -76,6 +105,7 @@ Page({
     const query = wx.createSelectorQuery();
     query.select('.game-canvas').boundingClientRect();
     query.exec(res => {
+      if (!res[0]) return;
       const canvasWidth = res[0].width;
       const canvasHeight = res[0].height;
       
@@ -131,12 +161,6 @@ Page({
       this.animationId = setTimeout(loop, 100);
     };
     loop();
-  },
-
-  onUnload() {
-    if (this.animationId) {
-      clearTimeout(this.animationId);
-    }
   },
 
   // 摇杆控制
@@ -278,6 +302,30 @@ Page({
     this.setData({
       moodColor: `rgb(${r}, ${g}, ${b})`
     });
+  },
+
+  // 音乐设置
+  openMusicSettings() {
+    this.setData({ showMusicSettings: true });
+  },
+
+  closeMusicSettings() {
+    this.setData({ showMusicSettings: false });
+  },
+
+  stopPropagation() {},
+
+  selectMusic(e) {
+    const music = e.currentTarget.dataset.music;
+    this.setData({ currentMusic: music });
+    audioPlayer.play(music, true);
+    audioPlayer.setVolume(this.data.volume);
+  },
+
+  onVolumeChange(e) {
+    const volume = e.detail.value / 100;
+    this.setData({ volume });
+    audioPlayer.setVolume(volume);
   },
 
   // 触摸点击

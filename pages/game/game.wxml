@@ -4,6 +4,7 @@
     <text>第 {{player.gameDay}} 天</text>
     <text>{{season.name}}</text>
     <text>{{weather.name}}</text>
+    <button class="music-btn" bindtap="openMusicSettings">🎵</button>
   </view>
 
   <!-- Canvas 地图 -->
@@ -44,6 +45,38 @@
   <view class="joystick-area" bindtouchstart="startJoystick" bindtouchmove="moveJoystick" bindtouchend="endJoystick">
     <view class="joystick-base" style="left: {{joystick.x}}px; bottom: {{joystick.y}}px">
       <view class="joystick-knob" style="left: {{joystick.knobX}}px; top: {{joystick.knobY}}px"></view>
+    </view>
+  </view>
+
+  <!-- 音乐选择弹窗 -->
+  <view wx:if="{{showMusicSettings}}" class="modal-overlay" bindtap="closeMusicSettings">
+    <view class="music-modal" catchtap="stopPropagation">
+      <view class="modal-title">选择背景音乐</view>
+      <view class="music-list">
+        <view 
+          class="music-item {{currentMusic.id === item.id ? 'active' : ''}}" 
+          bindtap="selectMusic"
+          data-music="{{item}}"
+        >
+          <view class="music-info">
+            <text class="music-name">{{item.name}}</text>
+            <text class="music-desc">{{item.description}}</text>
+          </view>
+          <text wx:if="{{currentMusic.id === item.id}}" class="playing-tag">正在播放</text>
+        </view>
+        <block wx:for="{{allMusicList}}" wx:key="id"></block>
+      </view>
+      <view class="volume-control">
+        <text>音量: {{Math.round(volume * 100)}}%</text>
+        <slider 
+          min="0" 
+          max="100" 
+          value="{{volume * 100}}" 
+          bindchange="onVolumeChange"
+          block-size="20"
+        />
+      </view>
+      <button class="close-modal-btn" bindtap="closeMusicSettings">完成</button>
     </view>
   </view>
 </view>
