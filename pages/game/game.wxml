@@ -1,0 +1,49 @@
+<view class="container game">
+  <!-- 状态栏信息 -->
+  <view class="status-bar">
+    <text>第 {{player.gameDay}} 天</text>
+    <text>{{season.name}}</text>
+    <text>{{weather.name}}</text>
+  </view>
+
+  <!-- Canvas 地图 -->
+  <canvas 
+    canvas-id="gameCanvas" 
+    class="game-canvas"
+    bindtouchstart="onTouchStart"
+    bindtouchmove="onTouchMove"
+    bindtouchend="onTouchEnd"
+    style="background-color: {{seasonBgColor}}"
+  ></canvas>
+
+  <!-- 情绪状态栏 -->
+  <view class="mood-bar">
+    <text>心情</text>
+    <view class="mood-progress">
+      <view class="mood-fill" style="width: {{player.mood * 100}}%; background-color: {{moodColor}}"></view>
+    </view>
+    <text>{{moodDesc}}</text>
+  </view>
+
+  <!-- 互动对话框 -->
+  <view wx:if="{{showDialog}}" class="dialog-box">
+    <view class="dialog-header">{{entity.name}}说：</view>
+    <view class="dialog-content">{{dialogText}}</view>
+    <view wx:if="{{canInput}}" class="dialog-input">
+      <input 
+        placeholder="你想说点什么..." 
+        value="{{inputText}}"
+        bindinput="onInputChange"
+      />
+      <button class="send-btn" bindtap="sendQuestion">问</button>
+    </view>
+    <button class="close-btn" bindtap="closeDialog">知道了</button>
+  </view>
+
+  <!-- 方向控制摇杆 -->
+  <view class="joystick-area" bindtouchstart="startJoystick" bindtouchmove="moveJoystick" bindtouchend="endJoystick">
+    <view class="joystick-base" style="left: {{joystick.x}}px; bottom: {{joystick.y}}px">
+      <view class="joystick-knob" style="left: {{joystick.knobX}}px; top: {{joystick.knobY}}px"></view>
+    </view>
+  </view>
+</view>

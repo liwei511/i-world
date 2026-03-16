@@ -1,0 +1,18 @@
+<view class="container home">
+  <view class="title">
+    <text class="title-main">I 的世界</text>
+    <text class="title-sub">一个人，一片天地</text>
+  </view>
+
+  <view class="intro">
+    <text class="intro-line">没有敌人，没有竞争，没有结局</text>
+    <text class="intro-line">只有你自己，和一整个自然</text>
+    <text class="intro-line">和花草说话，和自己对话</text>
+  </view>
+
+  <button class="start-btn" bindtap="startGame">进入世界 →</button>
+
+  <view class="footer">
+    <text>孤独不是惩罚，是和自己相处的礼物</text>
+  </view>
+</view>
