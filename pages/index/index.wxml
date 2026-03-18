@@ -1,18 +1,87 @@
-<view class="container home">
-  <view class="title">
-    <text class="title-main">I 的世界</text>
-    <text class="title-sub">一个人，一片天地</text>
+<!-- I 的世界 - 首页 -->
+<view class="container" style="background-color: {{seasonColors.skyColor}};">
+
+  <!-- 开始屏幕 -->
+  <view class="start-screen" wx:if="{{!gameStarted}}">
+    <text class="title">I 的世界</text>
+    <view class="intro">
+      <text>这里只有你一个人。</text>
+      <text>没有敌人，没有竞争，没有需要完成的任务。</text>
+      <text>你可以随便走，随便停，想说就说，想安静就安静。</text>
+      <text class="highlight">孤独不是寂寞，是你和自己相处的礼物。</text>
+    </view>
+    <button class="start-btn" bindtap="startGame">走进来</button>
   </view>
 
-  <view class="intro">
-    <text class="intro-line">没有敌人，没有竞争，没有结局</text>
-    <text class="intro-line">只有你自己，和一整个自然</text>
-    <text class="intro-line">和花草说话，和自己对话</text>
+  <!-- 游戏画布 -->
+  <canvas 
+    canvas-id="gameCanvas" 
+    bindtouchstart="onTouchStart"
+    bindtouchmove="onTouchMove"
+    class="game-canvas"
+    wx:if="{{gameStarted}}"
+    style="opacity: {{isMeditating ? 0.3 : 1}};"
+  ></canvas>
+
+  <!-- 冥想引导弹窗 -->
+  <view class="meditation-modal" wx:if="{{isMeditating}}">
+    <view class="meditation-content">
+      <text class="meditation-text">{{meditationPrompt}}</text>
+      <button class="next-btn" bindtap="nextMeditation">下一步</button>
+    </view>
   </view>
 
-  <button class="start-btn" bindtap="startGame">进入世界 →</button>
-
-  <view class="footer">
-    <text>孤独不是惩罚，是和自己相处的礼物</text>
+  <!-- 底部操作栏 -->
+  <view class="bottom-bar" wx:if="{{gameStarted}}">
+    <button class="action-btn" bindtap="openQuestion">❓ 提问</button>
+    <button class="action-btn" bindtap="openDiary">📔 日记</button>
+    <button class="action-btn" bindtap="openSeasonSelector">🍂 季节</button>
   </view>
+
+  <!-- 提问弹窗 -->
+  <view class="modal-overlay" wx:if="{{showQuestionModal}}" bindtap="closeQuestion">
+    <view class="modal-content" catchtap="stopPropagation">
+      <text class="modal-title">你想问什么？</text>
+      <input class="question-input" placeholder="输入你的问题..." value="{{questionText}}" bindinput="inputQuestion" />
+      <button class="submit-btn" bindtap="submitQuestion">得到回答</button>
+    </view>
+  </view>
+
+  <!-- 季节选择弹窗 -->
+  <view class="modal-overlay" wx:if="{{showSeasonSelector}}" bindtap="closeSeasonSelector">
+    <view class="modal-content season-content" catchtap="stopPropagation">
+      <text class="modal-title">选择季节</text>
+      <view class="season-list">
+        <block wx:for="{{seasonList}}" wx:key="key">
+          <view class="season-item" data-key="{{item.key}}" bindtap="selectSeason">
+            <text class="season-name">{{item.name}}</text>
+            <text class="season-mood">{{item.mood}}</text>
+          </view>
+        </block>
+      </view>
+    </view>
+  </view>
+
+  <!-- 日记弹窗 -->
+  <view class="modal-overlay diary-overlay" wx:if="{{showDiary}}" bindtap="closeDiary">
+    <view class="modal-content diary-content" catchtap="stopPropagation">
+      <text class="modal-title">我的足迹</text>
+      <view class="diary-stats">
+        <text>一共来了 {{diaryStats.totalVisits}} 次</text>
+        <text>问了 {{diaryStats.totalQuestions}} 个问题</text>
+      </view>
+      <scroll-view class="diary-list" scroll-y>
+        <block wx:for="{{diaryEntries}}" wx:key="index">
+          <view class="diary-entry">
+            <text class="diary-date">{{item.date}} {{item.time}}</text>
+            <text wx:if="{{item.type === 'question'}}" class="diary-question">Q: {{item.question}}</text>
+            <text wx:if="{{item.type === 'question'}}" class="diary-answer">A: {{item.answer}}</text>
+            <text wx:if="{{item.type === 'visit'}}" class="diary-visit">{{item.season}} {{item.weather}}</text>
+          </view>
+        </block>
+      </scroll-view>
+      <button class="close-btn" bindtap="closeDiary">关闭</button>
+    </view>
+  </view>
+
 </view>
