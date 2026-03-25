@@ -33,13 +33,13 @@ export function generateMap(width, height, season, weather) {
   generatePaths(map, width, height);
 
   // 随机生成树
-  const treeCount = Math.floor((width * height) / 30;
+  const treeCount = Math.floor((width * height) / 30);
   for (let i = 0; i < treeCount; i++) {
     placeRandomEntity(map, width, height, 'tree', season);
   }
 
   // 随机石头
-  const stoneCount = Math.floor((width * height) / 60;
+  const stoneCount = Math.floor((width * height) / 60);
   for (let i = 0; i < stoneCount; i++) {
     placeRandomEntity(map, width, height, 'stone');
   }
@@ -125,12 +125,13 @@ function maybePlacePond(map, width, height) {
 
   for (let dy = -radius; dy < radius; dy++) {
     for (let dx = -radius; dx < radius; dx++) {
-    const x = cx + dx;
-    const y = cy + dy;
-    if (x >= 0 && x < width && y >=0 && y < height) {
-      if (dx*dx + dy*dy < radius*radius) {
-        if (map[y][x].type = 'water';
-        map[y][x].walkable = false;
+      const x = cx + dx;
+      const y = cy + dy;
+      if (x >= 0 && x < width && y >=0 && y < height) {
+        if (dx*dx + dy*dy < radius*radius) {
+          if (map[y][x].type = 'water');
+          map[y][x].walkable = false;
+        }
       }
     }
   }
